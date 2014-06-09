@@ -19,12 +19,12 @@ aptitude -y install ubuntu-extras-keyring && \
     aptitude -y install usermin webmin && \
     aptitude update && aptitude -y full-upgrade && aptitude autoclean && aptitude clean
 
-aptitude -y install apache2 apache2-doc apache2-mpm-prefork apache2-suexec-custom awstats bind9 clamav clamav-base clamav-daemon clamav-docs clamav-freshclam clamav-testfiles dovecot-common dovecot-imapd dovecot-pop3d iptables libapache2-mod-fcgid libapache2-mod-php5 libapache2-mod-ruby libapache2-svn libcrypt-ssleay-perl libdbd-mysql-perl libdbd-pg-perl libfcgi-dev libgd2-xpm libnet-ssleay-perl libpg-perl libsasl2-2 libsasl2-modules libxml-simple-perl mailman mysql-client mysql-common mysql-server openssl php-pear php5 php5-cgi php5-mysql postfix postfix-pcre postgresql postgresql-client procmail proftpd-basic python quota ri ruby sasl2-bin spamassassin spamc subversion unzip webalizer zip
+aptitude -y install apache2 apache2-doc apache2-suexec-custom awstats awstats bind9 clamav clamav-base clamav-daemon clamav-docs clamav-freshclam clamav-testfiles dovecot-common dovecot-imapd dovecot-pop3d iptables irb libapache2-mod-fcgid libapache2-mod-php5 libapache2-svn libcrypt-ssleay-perl libcrypt-ssleay-perl libdbd-mysql-perl libdbd-pg-perl libfcgi-dev libnet-ssleay-perl libpg-perl libsasl2-2 libsasl2-modules libxml-simple-perl mailman mysql-client mysql-common mysql-server openssl php-pear php5 php5-cgi php5-mysql postfix postfix-pcre postgresql postgresql-client procmail procmail-wrapper proftpd python quota rdoc ri ruby ruby sasl2-bin scponly spamassassin spamc subversion unzip usermin webalizer webmin zip
 
 aptitude -y install virtualmin-base usermin-virtual-server-mobile virtualmin-base webmin-virtual-server-mobile webmin-virtualmin-dav webmin-virtualmin-svn
 
 # Post-configure after initial installation.
-aptitude -y install bmon colordiff ffmpeg git htop libapache2-mod-rpaf libssh2-php lvm2 memcached mlocate nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-ffmpeg php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync varnish vim
+aptitude -y install bmon colordiff ffmpeg git htop libapache2-mod-rpaf libssh2-php lvm2 lvm2 memcached mlocate nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-ffmpeg php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync sshfs varnish vim
 
 # Some recommended tweak on Virtualmin especially for Drupal virtual hosting.
 curl -sS https://getcomposer.org/installer | php
