@@ -7,7 +7,7 @@ sed -i 's/^#\s*deb/deb/g' /etc/apt/sources.list
 
 # Install Virtualmin with GPL installation script.
 export set VIRTUALMIN_NONINTERACTIVE=1
-sh <(curl -s http://software.virtualmin.com/gpl/scripts/install.sh) --force --host `hostname -f`
+sh <(curl -sL http://software.virtualmin.com/gpl/scripts/install.sh) --force --host `hostname -f`
 
 # (Double check) Install Virtualmin manually.
 aptitude -y install ubuntu-extras-keyring && \
