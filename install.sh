@@ -7,6 +7,7 @@ set -o xtrace
 # Clone repo into temp folder.
 TMPDIR=`mktemp -d`
 cd $TMPDIR
+aptitude -y install git
 git init
 git remote add origin https://github.com/phpshift/virtualmin.git
 git fetch origin
