@@ -6,7 +6,7 @@
 sed -i 's/^#\s*deb/deb/g' /etc/apt/sources.list
 
 # Install Virtualmin with official install.sh.
-curl -L http://software.virtualmin.com/gpl/scripts/install.sh | bash
+sh <(curl -s http://software.virtualmin.com/gpl/scripts/install.sh)
 
 # (Double check) Install Virtualmin manually.
 aptitude -y install ubuntu-extras-keyring && \
