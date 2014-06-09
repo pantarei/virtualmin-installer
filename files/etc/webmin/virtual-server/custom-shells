@@ -1,0 +1,12 @@
+owner=	desc=Email only	id=nologin	default=1	mailbox=1	shell=/dev/null	avail=1
+owner=	desc=Email and FTP	id=ftp	default=	mailbox=1	shell=/bin/false	avail=1
+owner=	desc=Email and SCP	id=nologin	default=	mailbox=1	shell=/usr/bin/scponly	avail=1
+owner=1	desc=Email only	id=nologin	default=	mailbox=	shell=/dev/null	avail=
+owner=1	desc=Email and FTP	id=ftp	default=	mailbox=	shell=/bin/false	avail=
+owner=1	desc=Email, FTP and SSH	id=ssh	default=	mailbox=	shell=/usr/bin/scponly	avail=
+owner=1	desc=Email, FTP and SSH	id=ssh	default=1	mailbox=	shell=/bin/bash	avail=1
+owner=1	desc=Email, FTP and SSH	id=ssh	default=	mailbox=	shell=/bin/sh	avail=1
+owner=1	desc=Email, FTP and SSH	id=ssh	default=	mailbox=	shell=/usr/bin/screen	avail=
+owner=1	desc=Email, FTP and SSH	id=ssh	default=	mailbox=	shell=/bin/dash	avail=
+owner=1	desc=Email, FTP and SSH	id=ssh	default=	mailbox=	shell=/usr/bin/tmux	avail=
+owner=1	desc=Email, FTP and SSH	id=ssh	default=	mailbox=	shell=/bin/rbash	avail=

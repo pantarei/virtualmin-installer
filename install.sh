@@ -4,6 +4,14 @@
 
 set -o xtrace
 
+# Clone repo into temp folder.
+TMPDIR=`mktemp -d`
+cd $TMPDIR
+git init
+git remote add origin https://github.com/phpshift/virtualmin.git
+git fetch origin
+git checkout master
+
 # Export some environment variables.
 export VIRTUALMIN_NONINTERACTIVE=1
 export DEBIAN_FRONTEND=noninteractive
@@ -31,6 +39,9 @@ aptitude -y install virtualmin-base usermin-virtual-server-mobile virtualmin-bas
 # Post-configure after initial installation.
 aptitude -y install bmon colordiff fail2ban ffmpeg git htop libapache2-mod-rpaf libssh2-php logwatch lvm2 memcached mlocate mytop nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-ffmpeg php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync sshfs varnish vim
 
+# Rsync all prepared template files.
+rsync -av $TMPDIR/files/etc/ /etc
+
 # Some recommended tweak on Virtualmin especially for Drupal virtual hosting.
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
@@ -40,35 +51,6 @@ composer global require "drush/drush:6.*"
 composer global require "phpunit/phpunit=4.1.*"
 
 a2enmod expires
-
-cat > /etc/apache2/conf.d/etag <<-EOF
-FileETag None
-<ifModule mod_headers.c>
-    Header unset ETag
-</ifModule>
-EOF
-
-cat > /etc/php5/conf.d/apc.ini <<-EOF
-apc.gc_ttl=3600
-apc.max_file_size=8M
-apc.mmap_file_mask=/tmp/apc.XXXXXX
-apc.rfc1867=1
-apc.rfc1867_ttl=600
-apc.shm_size=256M
-apc.ttl=600
-apc.user_ttl=600
-extension=apc.so
-EOF
-
-cat > /etc/apache2/mods-enabled/fcgid.conf <<-EOF
-<IfModule mod_fcgid.c>
-    AddHandler fcgid-script .fcgi
-    FcgidConnectTimeout 30
-    FcgidMaxProcesses 256
-    FcgidMaxProcessesPerClass 8
-    FcgidProcessLifeTime 300
-</IfModule>
-EOF
 
 find /etc/php5 -type f -name php.ini | while read line;
 do
@@ -85,21 +67,6 @@ done
 /etc/init.d/apache2 restart
 
 # Additional webmin/virtualmin configuration.
-cat > /etc/webmin/virtual-server/custom-shells <<-EOF
-owner= desc=Email only id=nologin      default=1       mailbox=1       shell=/dev/null avail=1
-owner= desc=Email and FTP      id=ftp  default=        mailbox=1       shell=/bin/false        avail=1
-owner= desc=Email and SCP      id=nologin      default=        mailbox=1       shell=/usr/bin/scponly  avail=1
-owner=1        desc=Email only id=nologin      default=        mailbox=        shell=/dev/null avail=
-owner=1        desc=Email and FTP      id=ftp  default=        mailbox=        shell=/bin/false        avail=
-owner=1        desc=Email, FTP and SSH id=ssh  default=        mailbox=        shell=/usr/bin/scponly  avail=
-owner=1        desc=Email, FTP and SSH id=ssh  default=1       mailbox=        shell=/bin/bash avail=1
-owner=1        desc=Email, FTP and SSH id=ssh  default=        mailbox=        shell=/bin/sh   avail=1
-owner=1        desc=Email, FTP and SSH id=ssh  default=        mailbox=        shell=/usr/bin/screen   avail=
-owner=1        desc=Email, FTP and SSH id=ssh  default=        mailbox=        shell=/bin/dash avail=
-owner=1        desc=Email, FTP and SSH id=ssh  default=        mailbox=        shell=/usr/bin/tmux     avail=
-owner=1        desc=Email, FTP and SSH id=ssh  default=        mailbox=        shell=/bin/rbash        avail=
-EOF
-
 cat > /etc/webmin/virtual-server/templates/1 <<-EOF
 mysql_suffix=${USER}_${PREFIX}_
 mysql=${USER}_${PREFIX}
