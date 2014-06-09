@@ -1,0 +1,6 @@
+*.cache
+*.corn
+/*/history/*
+/system-status/info
+/virtual-server/collected
+/virtual-server/last-config

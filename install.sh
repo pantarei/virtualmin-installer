@@ -64,12 +64,16 @@ do
     sed -i 's/^;*\(upload_max_filesize\) =.*$/\1 = 32M/g' $line
 done
 
-/etc/init.d/apache2 restart
-
 # Additional webmin/virtualmin configuration.
-cat > /etc/webmin/virtual-server/templates/1 <<-EOF
-mysql_suffix=${USER}_${PREFIX}_
-mysql=${USER}_${PREFIX}
+cat >> /etc/webmin/virtual-server/config <<-EOF
+bw_active=1
+bw_disable=0
+bw_enable=0
+bw_mail_all=0
+bw_step=1
+defip=0.0.0.0
+passwd_length=8
+passwd_mode=1
 EOF
 
 sed -i 's/^\(mysql_charset\)=.*$/\1=utf8/g' /etc/webmin/virtual-server/config
@@ -80,3 +84,12 @@ sed -i 's/^\(mysql_suffix\)=.*$/\1=${USER}_/g' /etc/webmin/virtual-server/config
 sed -i 's/^\(quota\)=.*$/\1=/g' /etc/webmin/virtual-server/plans/0
 sed -i 's/^\(uquota\)=.*$/\1=/g' /etc/webmin/virtual-server/plans/0
 sed -i 's/^\(domslimit\)=.*$/\1=/g' /etc/webmin/virtual-server/plans/0
+
+sed -i 's/^\(mysql\)=.*$/\1=${USER}_${PREFIX}/g' /etc/webmin/virtual-server/templates/1
+sed -i 's/^\(mysql_suffix\)=.*$/\1=${USER}_${PREFIX}_/g' /etc/webmin/virtual-server/templates/1
+
+# Restart services.
+/etc/init.d/apache2 restart
+/etc/init.d/mysql restart
+/etc/init.d/proftpd stop; /etc/init.d/proftpd start
+/etc/init.d/mailman stop; /etc/init.d/mailman start
