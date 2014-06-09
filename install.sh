@@ -42,6 +42,11 @@ aptitude -y install bmon colordiff fail2ban ffmpeg git htop libapache2-mod-rpaf 
 # Rsync all prepared template files.
 rsync -av $TMPDIR/files/etc/ /etc
 
+# Archive /etc/webmin with git for debug.
+git init /etc/webmin
+cd /etc/webmin && git add --all .
+cd /etc/webmin && git commit -am 'Initial commit'
+
 # Some recommended tweak on Virtualmin especially for Drupal virtual hosting.
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
