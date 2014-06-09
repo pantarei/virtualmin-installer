@@ -27,7 +27,7 @@ aptitude -y install apache2 apache2-doc apache2-suexec-custom awstats awstats bi
 aptitude -y install virtualmin-base usermin-virtual-server-mobile virtualmin-base webmin-virtual-server-mobile webmin-virtualmin-dav webmin-virtualmin-svn
 
 # Post-configure after initial installation.
-aptitude -y install bmon colordiff ffmpeg git htop libapache2-mod-rpaf libssh2-php logwatch lvm2 memcached mlocate mytop nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-ffmpeg php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync sshfs varnish vim
+aptitude -y install bmon colordiff fail2ban ffmpeg git htop libapache2-mod-rpaf libssh2-php logwatch lvm2 memcached mlocate mytop nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-ffmpeg php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync sshfs varnish vim
 
 # Some recommended tweak on Virtualmin especially for Drupal virtual hosting.
 curl -sS https://getcomposer.org/installer | php
@@ -40,8 +40,10 @@ composer global require "phpunit/phpunit=4.1.*"
 a2enmod expires
 
 cat > /etc/apache2/conf.d/etag <<-EOF
-Header unset ETag
 FileETag None
+<ifModule mod_headers.c>
+    Header unset ETag
+</ifModule>
 EOF
 
 cat > /etc/php5/conf.d/apc.ini <<-EOF
@@ -79,6 +81,36 @@ do
 done
 
 /etc/init.d/apache2 restart
+
+# Additional webmin/virtualmin configuration.
+cat > /etc/webmin/virtual-server/custom-shells <<-EOF
+owner= desc=Email only id=nologin      default=1       mailbox=1       shell=/dev/null avail=1
+owner= desc=Email and FTP      id=ftp  default=        mailbox=1       shell=/bin/false        avail=1
+owner= desc=Email and SCP      id=nologin      default=        mailbox=1       shell=/usr/bin/scponly  avail=1
+owner=1        desc=Email only id=nologin      default=        mailbox=        shell=/dev/null avail=
+owner=1        desc=Email and FTP      id=ftp  default=        mailbox=        shell=/bin/false        avail=
+owner=1        desc=Email, FTP and SSH id=ssh  default=        mailbox=        shell=/usr/bin/scponly  avail=
+owner=1        desc=Email, FTP and SSH id=ssh  default=1       mailbox=        shell=/bin/bash avail=1
+owner=1        desc=Email, FTP and SSH id=ssh  default=        mailbox=        shell=/bin/sh   avail=1
+owner=1        desc=Email, FTP and SSH id=ssh  default=        mailbox=        shell=/usr/bin/screen   avail=
+owner=1        desc=Email, FTP and SSH id=ssh  default=        mailbox=        shell=/bin/dash avail=
+owner=1        desc=Email, FTP and SSH id=ssh  default=        mailbox=        shell=/usr/bin/tmux     avail=
+owner=1        desc=Email, FTP and SSH id=ssh  default=        mailbox=        shell=/bin/rbash        avail=
+EOF
+
+cat > /etc/webmin/virtual-server/templates/1 <<-EOF
+mysql_suffix=${USER}_${PREFIX}_
+mysql=${USER}_${PREFIX}
+EOF
+
+sed -i 's/^\(mysql_charset\)=.*$/\1=utf8/g' /etc/webmin/virtual-server/config
+sed -i 's/^\(mysql_collate\)=.*$/\1=utf8_general_ci/g' /etc/webmin/virtual-server/config
+sed -i 's/^\(mysql_db\)=.*$/\1=${USER}/g' /etc/webmin/virtual-server/config
+sed -i 's/^\(mysql_suffix\)=.*$/\1=${USER}_/g' /etc/webmin/virtual-server/config
+
+sed -i 's/^\(quota\)=.*$/\1=/g' /etc/webmin/virtual-server/plans/0
+sed -i 's/^\(uquota\)=.*$/\1=/g' /etc/webmin/virtual-server/plans/0
+sed -i 's/^\(domslimit\)=.*$/\1=/g' /etc/webmin/virtual-server/plans/0
 
 # Quit Bash Shell Without Saving History
 rm -f $HISTFILE && unset HISTFILE && exit
