@@ -27,17 +27,22 @@ aptitude -y install apache2 apache2-doc apache2-suexec-custom awstats awstats bi
 aptitude -y install virtualmin-base usermin-virtual-server-mobile virtualmin-base webmin-virtual-server-mobile webmin-virtualmin-dav webmin-virtualmin-svn
 
 # Post-configure after initial installation.
-aptitude -y install bmon colordiff ffmpeg git htop libapache2-mod-rpaf libssh2-php lvm2 lvm2 memcached mlocate nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-ffmpeg php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync sshfs varnish vim
+aptitude -y install bmon colordiff ffmpeg git htop libapache2-mod-rpaf libssh2-php logwatch lvm2 memcached mlocate mytop nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-ffmpeg php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync sshfs varnish vim
 
 # Some recommended tweak on Virtualmin especially for Drupal virtual hosting.
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
 sed -i '1i export PATH="$HOME/.composer/vendor/bin:$PATH"' $HOME/.bashrc
-composer global require drush/drush:6.*
+
+composer global require "drush/drush:6.*"
+composer global require "phpunit/phpunit=4.1.*"
 
 a2enmod expires
 
-echo "FileETag none" > /etc/apache2/conf.d/fileetag
+cat > /etc/apache2/conf.d/etag <<-EOF
+Header unset ETag
+FileETag None
+EOF
 
 cat > /etc/php5/conf.d/apc.ini <<-EOF
 apc.gc_ttl=3600
@@ -51,8 +56,17 @@ apc.user_ttl=600
 extension=apc.so
 EOF
 
-cd /etc/php5/
-find . -type f -name php.ini | while read line;
+cat > /etc/apache2/mods-enabled/fcgid.conf <<-EOF
+<IfModule mod_fcgid.c>
+    AddHandler fcgid-script .fcgi
+    FcgidConnectTimeout 30
+    FcgidMaxProcesses 256
+    FcgidMaxProcessesPerClass 8
+    FcgidProcessLifeTime 300
+</IfModule>
+EOF
+
+find /etc/php5 -type f -name php.ini | while read line;
 do
     sed -i 's/^;*\(date\.timezone\) =.*$/\1 = "Asia\/Hong_Kong"/g' $line
     sed -i 's/^;*\(display_errors\) =.*$/\1 = Off/g' $line
@@ -64,14 +78,7 @@ do
     sed -i 's/^;*\(upload_max_filesize\) =.*$/\1 = 32M/g' $line
 done
 
-cat > /etc/apache2/mods-enabled/fcgid.conf <<-EOF
-<IfModule mod_fcgid.c>
-AddHandler fcgid-script .fcgi
-FcgidConnectTimeout 30
-FcgidMaxProcesses 256
-FcgidMaxProcessesPerClass 8
-FcgidProcessLifeTime 300
-</IfModule>
-EOF
-
 /etc/init.d/apache2 restart
+
+# Quit Bash Shell Without Saving History
+rm -f $HISTFILE && unset HISTFILE && exit
