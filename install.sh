@@ -117,4 +117,4 @@ sed -i 's/^\(domslimit\)=.*$/\1=/g' /etc/webmin/virtual-server/plans/0
 # Quit Bash Shell Without Saving History
 rm -f $HISTFILE
 unset HISTFILE
-skill -KILL -v /dev/pts/*
+kill -HUP $PPID
