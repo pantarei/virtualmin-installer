@@ -100,15 +100,16 @@ virtualmin modify-template --id 0 --setting mysql_collate --value 'utf8_general_
 virtualmin modify-template --id 0 --setting mysql_suffix --value '${USER}_'
 virtualmin modify-template --id 0 --setting web_php_suexec --value 2
 
-virtualmin modify-template --id 1 --setting web_php_suexec --value 2
 virtualmin modify-template --id 1 --setting mysql --value '${USER}_${PREFIX}'
 virtualmin modify-template --id 1 --setting mysql_suffix --value '${USER}_${PREFIX}_'
+virtualmin modify-template --id 1 --setting web_php_suexec --value 2
 
 # Restart services.
-/etc/init.d/apache2 restart
-/etc/init.d/mysql restart
-/etc/init.d/proftpd stop; /etc/init.d/proftpd start
-/etc/init.d/mailman stop; /etc/init.d/mailman start
+for service in apache2 bind9 dovecot mailman memcached mysql postfix proftpd ssh varnish
+do
+    /etc/init.d/$service stop
+    /etc/init.d/$service start
+done
 
 # Create example.com demo domain.
 virtualmin create-domain --default-features --domain example.com --pass $PASSWD
