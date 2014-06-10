@@ -5,6 +5,11 @@
 # Enable xtrace for debug.
 set -o xtrace
 
+# Ensure all APT source and install required packages.
+sed -i 's/^#\s*deb/deb/g' /etc/apt/sources.list
+aptitude update
+aptitude -y install coreutils curl git pwgen sed wget
+
 # Define variables.
 PASSWD=`pwgen`
 TMPDIR=`mktemp -d`
@@ -15,11 +20,6 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Update root password
 echo "root:$PASSWD" | chpasswd
-
-# Ensure all APT source and install required packages.
-sed -i 's/^#\s*deb/deb/g' /etc/apt/sources.list
-aptitude update
-aptitude -y install curl git pwgen sed wget
 
 # Clone repo into temp folder.
 cd $TMPDIR
