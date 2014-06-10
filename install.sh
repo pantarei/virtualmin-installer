@@ -6,7 +6,7 @@
 set -o xtrace
 
 # Define variables.
-BRANCH="precise"
+BRANCH="master"
 PASSWD=`< /dev/urandom tr -dc A-Za-z0-9 | head -c8`
 TMPDIR=`mktemp -d`
 
