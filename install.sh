@@ -47,7 +47,7 @@ aptitude -y install apache2 apache2-doc apache2-suexec-custom awstats awstats bi
 aptitude -y install virtualmin-base usermin-virtual-server-mobile virtualmin-base webmin-virtual-server-mobile webmin-virtualmin-dav webmin-virtualmin-svn
 
 # Post-configure after initial installation.
-aptitude -y install automysqlbackup bmon colordiff fail2ban ffmpeg git htop libapache2-mod-rpaf libssh2-php logwatch lvm2 memcached mlocate mytop nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-ffmpeg php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync sshfs varnish vim
+aptitude -y install automysqlbackup bmon colordiff fail2ban ffmpeg git htop libapache2-mod-rpaf libssh2-php logwatch lvm2 memcached mlocate mytop nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync sshfs snmp-mibs-downloader varnish vim
 
 # Rsync all prepared template files.
 rsync -av $TMPDIR/files/etc/ /etc
@@ -68,6 +68,7 @@ composer global require "drush/drush:6.*"
 composer global require "phpunit/phpunit=4.1.*"
 
 a2enmod expires
+a2enconf etag
 
 find /etc/php5 -type f -name php.ini | while read line;
 do
