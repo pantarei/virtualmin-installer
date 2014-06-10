@@ -12,7 +12,7 @@ export DEBIAN_FRONTEND=noninteractive
 # Ensure all APT source and install required packages.
 sed -i 's/^#\s*deb/deb/g' /etc/apt/sources.list
 aptitude update
-aptitude -y install curl git sed wget
+aptitude -y install curl git pwgen sed wget
 
 # Clone repo into temp folder.
 TMPDIR=`mktemp -d`
@@ -53,7 +53,9 @@ cd /etc/webmin && git commit -am 'Initial commit'
 # Some recommended tweak on Virtualmin especially for Drupal virtual hosting.
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
+
 sed -i '1i export PATH="$HOME/.composer/vendor/bin:$PATH"' $HOME/.bashrc
+source $HOME/.bashrc
 
 composer global require "drush/drush:6.*"
 composer global require "phpunit/phpunit=4.1.*"
@@ -84,20 +86,39 @@ passwd_length=8
 passwd_mode=1
 EOF
 
-sed -i 's/^\(mysql_charset\)=.*$/\1=utf8/g' /etc/webmin/virtual-server/config
-sed -i 's/^\(mysql_collate\)=.*$/\1=utf8_general_ci/g' /etc/webmin/virtual-server/config
-sed -i 's/^\(mysql_db\)=.*$/\1=${USER}/g' /etc/webmin/virtual-server/config
-sed -i 's/^\(mysql_suffix\)=.*$/\1=${USER}_/g' /etc/webmin/virtual-server/config
+virtualmin modify-plan --id 0 --no-quota --no-admin-quota --no-max-doms
 
-sed -i 's/^\(quota\)=.*$/\1=/g' /etc/webmin/virtual-server/plans/0
-sed -i 's/^\(uquota\)=.*$/\1=/g' /etc/webmin/virtual-server/plans/0
-sed -i 's/^\(domslimit\)=.*$/\1=/g' /etc/webmin/virtual-server/plans/0
+virtualmin modify-template --id 0 --setting mysql --value '${USER}_${PREFIX}'
+virtualmin modify-template --id 0 --setting mysql_charset --value 'utf8'
+virtualmin modify-template --id 0 --setting mysql_collate --value 'utf8_general_ci'
+virtualmin modify-template --id 0 --setting mysql_suffix --value '${USER}_${PREFIX}_'
+virtualmin modify-template --id 0 --setting web_php_suexec --value 2
 
-sed -i 's/^\(mysql\)=.*$/\1=${USER}_${PREFIX}/g' /etc/webmin/virtual-server/templates/1
-sed -i 's/^\(mysql_suffix\)=.*$/\1=${USER}_${PREFIX}_/g' /etc/webmin/virtual-server/templates/1
+virtualmin modify-template --id 1 --setting web_php_suexec --value 2
+virtualmin modify-template --id 1 --setting mysql --value '${USER}_${PREFIX}'
+virtualmin modify-template --id 1 --setting mysql_suffix --value '${USER}_${PREFIX}_'
 
 # Restart services.
 /etc/init.d/apache2 restart
 /etc/init.d/mysql restart
 /etc/init.d/proftpd stop; /etc/init.d/proftpd start
 /etc/init.d/mailman stop; /etc/init.d/mailman start
+
+# Create example.com demo domain.
+PASSWD=`pwgen`
+virtualmin create-domain --default-features --domain example.com --pass $PASSWD
+virtualmin create-domain --default-features --domain sub.example.com --parent example.com
+virtualmin create-domain --default-features --domain alias.example.com --alias example.com
+
+cat > /home/example/public_html/phpinfo.php <<-EOF
+<?php phpinfo(); ?>
+EOF
+
+cd /home/example
+drush -y dl drupal --drupal-project-rename=public_html
+cd /home/example/public_html
+curl -s https://drupal.org/files/issues/drupal-7.x-symlinksifownermatch-2106057-5.patch | patch -p1
+drush -y site-install --db-url=mysql://example:$PASSWD@localhost/example --account-pass=$PASSWD
+chown -Rf example:example /home/example/
+
+echo "example.com created with password '$PASSWD'."
