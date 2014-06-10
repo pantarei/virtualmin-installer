@@ -5,14 +5,15 @@
 # Enable xtrace for debug.
 set -o xtrace
 
+# Define variables.
+BRANCH="precise"
+PASSWD=`< /dev/urandom tr -dc A-Za-z0-9 | head -c8`
+TMPDIR=`mktemp -d`
+
 # Ensure all APT source and install required packages.
 sed -i 's/^#\s*deb/deb/g' /etc/apt/sources.list
 aptitude update
 aptitude -y install coreutils curl git pwgen sed wget
-
-# Define variables.
-PASSWD=`pwgen`
-TMPDIR=`mktemp -d`
 
 # Export some environment variables.
 export VIRTUALMIN_NONINTERACTIVE=1
@@ -26,7 +27,7 @@ cd $TMPDIR
 git init
 git remote add origin https://github.com/phpshift/virtualmin.git
 git fetch origin
-git checkout master
+git checkout $BRANCH
 
 # Install Virtualmin with GPL installation script.
 sh <(curl -sL http://software.virtualmin.com/gpl/scripts/install.sh) --force --host `hostname -f`
@@ -124,6 +125,3 @@ cd /home/example/public_html
 curl -s -L http://bit.ly/1gbHwTb | ACTION=build PACKAGE=full bash
 drush -y site-install drustack --db-url=mysql://example:$PASSWD@localhost/example --account-pass=$PASSWD
 chown -Rf example:example /home/example/
-
-echo "PASSWD=$PASSWD"
-echo "TMPDIR=$TMPDIR"
