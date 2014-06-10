@@ -107,6 +107,10 @@ virtualmin modify-template --id 1 --setting mysql_suffix --value '${USER}_${PREF
 virtualmin modify-template --id 1 --setting web_php_suexec --value 2
 
 # Restart services.
+for i in `sql 1 10`
+do
+    killall -9 mysqld
+done
 for service in apache2 bind9 dovecot mailman memcached mysql postfix proftpd ssh varnish
 do
     /etc/init.d/$service stop
