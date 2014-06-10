@@ -5,9 +5,16 @@
 # Enable xtrace for debug.
 set -o xtrace
 
+# Define variables.
+TMPDIR=`mktemp -d`
+PASSWD=`pwgen`
+
 # Export some environment variables.
 export VIRTUALMIN_NONINTERACTIVE=1
 export DEBIAN_FRONTEND=noninteractive
+
+# Update root password
+echo "root:$PASSWD" | chpasswd
 
 # Ensure all APT source and install required packages.
 sed -i 's/^#\s*deb/deb/g' /etc/apt/sources.list
@@ -15,7 +22,6 @@ aptitude update
 aptitude -y install curl git pwgen sed wget
 
 # Clone repo into temp folder.
-TMPDIR=`mktemp -d`
 cd $TMPDIR
 git init
 git remote add origin https://github.com/phpshift/virtualmin.git
@@ -88,10 +94,10 @@ EOF
 
 virtualmin modify-plan --id 0 --no-quota --no-admin-quota --no-max-doms
 
-virtualmin modify-template --id 0 --setting mysql --value '${USER}_${PREFIX}'
+virtualmin modify-template --id 0 --setting mysql --value '${USER}'
 virtualmin modify-template --id 0 --setting mysql_charset --value 'utf8'
 virtualmin modify-template --id 0 --setting mysql_collate --value 'utf8_general_ci'
-virtualmin modify-template --id 0 --setting mysql_suffix --value '${USER}_${PREFIX}_'
+virtualmin modify-template --id 0 --setting mysql_suffix --value '${USER}_'
 virtualmin modify-template --id 0 --setting web_php_suexec --value 2
 
 virtualmin modify-template --id 1 --setting web_php_suexec --value 2
@@ -105,7 +111,6 @@ virtualmin modify-template --id 1 --setting mysql_suffix --value '${USER}_${PREF
 /etc/init.d/mailman stop; /etc/init.d/mailman start
 
 # Create example.com demo domain.
-PASSWD=`pwgen`
 virtualmin create-domain --default-features --domain example.com --pass $PASSWD
 virtualmin create-domain --default-features --domain sub.example.com --parent example.com
 virtualmin create-domain --default-features --domain alias.example.com --alias example.com
