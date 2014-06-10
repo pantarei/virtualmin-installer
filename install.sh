@@ -6,8 +6,8 @@
 set -o xtrace
 
 # Define variables.
-TMPDIR=`mktemp -d`
 PASSWD=`pwgen`
+TMPDIR=`mktemp -d`
 
 # Export some environment variables.
 export VIRTUALMIN_NONINTERACTIVE=1
@@ -119,11 +119,10 @@ cat > /home/example/public_html/phpinfo.php <<-EOF
 <?php phpinfo(); ?>
 EOF
 
-cd /home/example
-drush -y dl drupal --drupal-project-rename=public_html
 cd /home/example/public_html
-curl -s https://drupal.org/files/issues/drupal-7.x-symlinksifownermatch-2106057-5.patch | patch -p1
-drush -y site-install --db-url=mysql://example:$PASSWD@localhost/example --account-pass=$PASSWD
+curl -s -L http://bit.ly/1gbHwTb | ACTION=build PACKAGE=full bash
+drush -y site-install drustack --db-url=mysql://example:$PASSWD@localhost/example --account-pass=$PASSWD
 chown -Rf example:example /home/example/
 
-echo "example.com created with password '$PASSWD'."
+echo "PASSWD=$PASSWD"
+echo "TMPDIR=$TMPDIR"
