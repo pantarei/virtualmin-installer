@@ -2,23 +2,25 @@
 
 # Wrapper for Virtualmin installer.
 
+# Enable xtrace for debug.
 set -o xtrace
-
-# Clone repo into temp folder.
-TMPDIR=`mktemp -d`
-cd $TMPDIR
-aptitude -y install git
-git init
-git remote add origin https://github.com/phpshift/virtualmin.git
-git fetch origin
-git checkout master
 
 # Export some environment variables.
 export VIRTUALMIN_NONINTERACTIVE=1
 export DEBIAN_FRONTEND=noninteractive
 
-# Ensure all APT source enabled.
+# Ensure all APT source and install required packages.
 sed -i 's/^#\s*deb/deb/g' /etc/apt/sources.list
+aptitude update
+aptitude -y install curl git sed wget
+
+# Clone repo into temp folder.
+TMPDIR=`mktemp -d`
+cd $TMPDIR
+git init
+git remote add origin https://github.com/phpshift/virtualmin.git
+git fetch origin
+git checkout master
 
 # Install Virtualmin with GPL installation script.
 sh <(curl -sL http://software.virtualmin.com/gpl/scripts/install.sh) --force --host `hostname -f`
