@@ -127,5 +127,5 @@ EOF
 
 cd /home/example/public_html
 curl -s -L http://bit.ly/1gbHwTb | ACTION=build PACKAGE=full bash
-drush -y site-install drustack --db-url=mysql://example:$PASSWD@localhost/example --account-pass=$PASSWD
+drush -y site-install standard --db-url=mysql://example:$PASSWD@localhost/example --account-pass=$PASSWD
 chown -Rf example:example /home/example/
