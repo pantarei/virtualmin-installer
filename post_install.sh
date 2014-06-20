@@ -10,5 +10,6 @@ cat /etc/resolv.conf
 
 # Print the clean history command.
 cat <<-EOF
-rm -f $HISTFILE && unset HISTFILE && exit
+# Command for clean history and logout current session.
+rm -f \$HISTFILE && unset HISTFILE && exit
 EOF
