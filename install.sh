@@ -128,7 +128,9 @@ sleep 3
 mysql -u root -e "UPDATE mysql.user SET Password=PASSWORD('$PASSWD') WHERE User = 'root';"
 mysql -u root -e "FLUSH PRIVILEGES;"
 
-sed -i "s/^\(pass\)=.*$/\1=$PASSWD" /etc/webmin/mysql/config
+cat >> /etc/webmin/mysql/config <<-EOF
+pass=$PASSWD
+EOF
 
 cat > $HOME/.my.cnf <<-EOF
 [client]
