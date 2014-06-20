@@ -115,6 +115,37 @@ do
     /etc/init.d/$service start
 done
 
+# Setup MySQL root password.
+for i in `seq 1 10`
+do
+    /etc/init.d/mysql stop
+    killall -9 mysqld
+done
+
+mysqld_safe --skip-grant-tables &
+sleep 3
+
+mysql -u root -e "UPDATE mysql.user SET Password=PASSWORD('$PASSWD') WHERE User = 'root';"
+mysql -u root -e "FLUSH PRIVILEGES;"
+
+sed -i "s/^\(pass\)=.*$/\1=$PASSWD" /etc/webmin/mysql/config
+
+cat > $HOME/.my.cnf <<-EOF
+[client]
+host     = localhost
+user     = root
+password = $PASSWD
+socket   = /var/run/mysqld/mysqld.sock
+EOF
+chmod 600 $HOME/.my.cnf
+
+for i in `seq 1 10`
+do
+    /etc/init.d/mysql stop
+    killall -9 mysqld
+done
+/etc/init.d/mysql restart
+
 # Create example.com demo domain.
 virtualmin create-domain --default-features --domain example.com --pass $PASSWD
 virtualmin create-domain --default-features --domain sub.example.com --parent example.com
