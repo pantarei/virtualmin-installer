@@ -82,6 +82,8 @@ do
     sed -i 's/^;*\(upload_max_filesize\) =.*$/\1 = 32M/g' $line
 done
 
+bash <(curl -sL https://github.com/pantarei/vim-pathogen/raw/master/install.sh)
+
 # Additional webmin/virtualmin configuration.
 cat >> /etc/webmin/virtual-server/config <<-EOF
 bw_active=1
