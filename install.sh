@@ -5,6 +5,10 @@
 # Enable xtrace for debug.
 set -o xtrace
 
+# Export some environment variables.
+export VIRTUALMIN_NONINTERACTIVE=1
+export DEBIAN_FRONTEND=noninteractive
+
 # Define variables.
 BRANCH="master"
 PASSWD=`< /dev/urandom tr -dc A-Za-z0-9 | head -c8`
@@ -12,12 +16,11 @@ TMPDIR=`mktemp -d`
 
 # Ensure all APT source and install required packages.
 sed -i 's/^#\s*deb/deb/g' /etc/apt/sources.list
-aptitude update
-aptitude -y install coreutils curl git pwgen sed wget
-
-# Export some environment variables.
-export VIRTUALMIN_NONINTERACTIVE=1
-export DEBIAN_FRONTEND=noninteractive
+aptitude update && aptitude -y full-upgrade && aptitude autoclean && aptitude clean && \
+    aptitude -y install coreutils curl git pwgen sed ubuntu-extras-keyring wget && \
+    tasksel install openssh-server && \
+    tasksel install server && \
+    tasksel install mail-server
 
 # Update root password
 echo "root:$PASSWD" | chpasswd
@@ -30,24 +33,10 @@ git fetch origin
 git checkout $BRANCH
 
 # Install Virtualmin with GPL installation script.
-sh <(curl -sL http://software.virtualmin.com/gpl/scripts/install.sh) --force --host `hostname -f`
-
-# (Double check) Install Virtualmin manually.
-aptitude -y install ubuntu-extras-keyring && \
-    aptitude update && \
-    aptitude -y full-upgrade && \
-    tasksel install openssh-server && \
-    tasksel install server && \
-    tasksel install mail-server && \
-    aptitude -y install usermin webmin && \
-    aptitude update && aptitude -y full-upgrade && aptitude autoclean && aptitude clean
-
-aptitude -y install apache2 apache2-doc apache2-suexec-custom awstats awstats bind9 clamav clamav-base clamav-daemon clamav-docs clamav-freshclam clamav-testfiles dovecot-common dovecot-imapd dovecot-pop3d iptables irb libapache2-mod-fcgid libapache2-mod-php5 libapache2-svn libcrypt-ssleay-perl libcrypt-ssleay-perl libdbd-mysql-perl libdbd-pg-perl libfcgi-dev libnet-ssleay-perl libpg-perl libsasl2-2 libsasl2-modules libxml-simple-perl mailman mysql-client mysql-common mysql-server openssl php-pear php5 php5-cgi php5-mysql postfix postfix-pcre postgresql postgresql-client procmail procmail-wrapper proftpd python quota rdoc ri ruby ruby sasl2-bin scponly spamassassin spamc subversion unzip usermin webalizer webmin zip
-
-aptitude -y install virtualmin-base usermin-virtual-server-mobile virtualmin-base webmin-virtual-server-mobile webmin-virtualmin-dav webmin-virtualmin-svn
+sh <(curl -sL http://software.virtualmin.com/gpl/scripts/install.sh) --force --host host.example.com
 
 # Post-configure after initial installation.
-aptitude -y install automysqlbackup bmon colordiff fail2ban ffmpeg git htop libapache2-mod-rpaf libssh2-php logwatch lvm2 memcached mlocate mytop nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync sshfs snmp-mibs-downloader varnish vim
+aptitude -y install automysqlbackup bmon colordiff fail2ban ffmpeg git htop libapache2-mod-rpaf libssh2-php logwatch lvm2 memcached mlocate mytop nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync snmp-mibs-downloader sshfs usermin usermin-virtual-server-mobile varnish vim virtualmin-base virtualmin-base webmin webmin-virtual-server-mobile webmin-virtualmin-dav webmin-virtualmin-svn
 
 # Rsync all prepared template files.
 rsync -av $TMPDIR/files/etc/ /etc
