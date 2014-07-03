@@ -1,7 +1,7 @@
 virtualmin-installer
 ====================
 
-Wrapper for Virtualmin installer.
+Wrapper for [Virtualmin](http://www.virtualmin.com/) installer.
 
 Run this script with:
 
