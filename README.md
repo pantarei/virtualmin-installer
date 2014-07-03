@@ -1,5 +1,5 @@
-virtualmin
-==========
+virtualmin-installer
+====================
 
 Wrapper for Virtualmin installer.
 
