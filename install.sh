@@ -72,7 +72,7 @@ done
 
 bash <(curl -sL https://github.com/phpshift/vim-pathogen-installer/raw/master/install.sh)
 
-newlist mailman admin@example.com $PASSWD
+newlist -q mailman admin@example.com $PASSWD
 
 # Additional webmin/virtualmin configuration.
 cat >> /etc/webmin/virtual-server/config <<-EOF
