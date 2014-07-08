@@ -28,7 +28,7 @@ echo "root:$PASSWD" | chpasswd
 # Clone repo into temp folder.
 cd $TMPDIR
 git init
-git remote add origin https://github.com/phpshift/virtualmin-install.git
+git remote add origin https://github.com/phpshift/virtualmin-installer.git
 git fetch origin
 git checkout $BRANCH
 
