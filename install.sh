@@ -12,7 +12,7 @@ export DEBIAN_FRONTEND=noninteractive
 # Define variables.
 BRANCH="master"
 PASSWD=`< /dev/urandom tr -dc A-Za-z0-9 | head -c8`
-TMPDIR=`mktemp -d`
+TMPDIR=`mktemp -d -t virtualmin-installer.XXXXXX`
 
 # Ensure all APT source and install required packages.
 sed -i 's/^#\s*deb/deb/g' /etc/apt/sources.list
@@ -152,6 +152,6 @@ cat > /home/example/public_html/phpinfo.php <<-EOF
 EOF
 
 cd /home/example/public_html
-curl -s -L http://bit.ly/1gbHwTb | ACTION=build PACKAGE=full bash
+curl -sL http://cgit.drupalcode.org/drustack/plain/drustack.sh | ACTION=build PACKAGE=full bash
 drush -y site-install standard --db-url=mysql://example:$PASSWD@localhost/example --account-pass=$PASSWD
 chown -Rf example:example /home/example/
