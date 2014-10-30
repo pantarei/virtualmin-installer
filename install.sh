@@ -151,6 +151,7 @@ cat > /home/example/public_html/phpinfo.php <<-EOF
 <?php phpinfo(); ?>
 EOF
 
+mkdir -p /home/example/public_html
 cd /home/example/public_html
 curl -sL http://cgit.drupalcode.org/drustack/plain/drustack.sh | ACTION=build PACKAGE=full bash
 drush -y site-install standard --db-url=mysql://example:$PASSWD@localhost/example --account-pass=$PASSWD
