@@ -117,7 +117,7 @@ do
 done
 
 mysqld_safe --skip-grant-tables &
-sleep 3
+sleep 10
 
 mysql -u root -e "UPDATE mysql.user SET Password=PASSWORD('$PASSWD') WHERE User = 'root';"
 mysql -u root -e "FLUSH PRIVILEGES;"
@@ -147,12 +147,9 @@ virtualmin create-domain --default-features --domain example.com --pass $PASSWD
 virtualmin create-domain --default-features --domain sub.example.com --parent example.com
 virtualmin create-domain --default-features --domain alias.example.com --alias example.com
 
-cat > /home/example/public_html/phpinfo.php <<-EOF
-<?php phpinfo(); ?>
-EOF
-
 mkdir -p /home/example/public_html
 cd /home/example/public_html
+echo "<?php phpinfo(); ?>" > phpinfo.php
 curl -sL http://cgit.drupalcode.org/drustack/plain/drustack.sh | ACTION=build PACKAGE=full bash
 drush -y site-install standard --db-url=mysql://example:$PASSWD@localhost/example --account-pass=$PASSWD
 chown -Rf example:example /home/example/
