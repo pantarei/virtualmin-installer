@@ -71,7 +71,7 @@ do
     sed -i 's/^;*\(upload_max_filesize\) =.*$/\1 = 32M/g' $line
 done
 
-bash <(curl -sL https://github.com/phpshift/vim-pathogen-installer/raw/master/install.sh)
+bash <(curl -sL https://raw.githubusercontent.com/pantarei/vundle-installer/master/install.sh)
 
 newlist -q mailman admin@example.com $PASSWD
 
