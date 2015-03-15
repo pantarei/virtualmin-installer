@@ -22,6 +22,10 @@ aptitude update && aptitude -y full-upgrade && aptitude autoclean && aptitude cl
     tasksel install server && \
     tasksel install mail-server
 
+# Install Linux kernel extra modules and enable quota support.
+aptitude -y install linux-image-extra-`uname -r`
+modprobe quota_v1 quota_v2
+
 # Update root password
 echo "root:$PASSWD" | chpasswd
 
