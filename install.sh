@@ -24,9 +24,11 @@ aptitude update && aptitude -y full-upgrade && aptitude autoclean && aptitude cl
 
 apt-add-repository -y ppa:duggan/composer && aptitude update
 aptitude -y install php5-composer
+composer selfupdate && composer global update
 
 add-apt-repository -y ppa:chris-lea/node.js && aptitude update
 aptitude -y install nodejs build-essential
+npm -g update && npm -g upgrade
 
 # Install Linux kernel extra modules and enable quota support.
 aptitude -y install linux-image-extra-`uname -r`
