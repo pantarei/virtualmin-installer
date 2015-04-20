@@ -22,6 +22,18 @@ aptitude update && aptitude -y full-upgrade && aptitude autoclean && aptitude cl
     tasksel install server && \
     tasksel install mail-server
 
+apt-add-repository -y ppa:duggan/composer && aptitude update
+aptitude -y install php5-composer
+composer selfupdate && composer global update
+
+add-apt-repository -y ppa:chris-lea/node.js && aptitude update
+aptitude -y install nodejs build-essential
+npm -g update && npm -g upgrade
+
+# Install Linux kernel extra modules and enable quota support.
+aptitude -y install linux-image-extra-`uname -r`
+modprobe quota_v1 quota_v2
+
 # Update root password
 echo "root:$PASSWD" | chpasswd
 
@@ -47,14 +59,8 @@ cd /etc/webmin && git add --all .
 cd /etc/webmin && git commit -am 'Initial commit'
 
 # Some recommended tweak on Virtualmin especially for Drupal virtual hosting.
-curl -sS https://getcomposer.org/installer | php
-mv composer.phar /usr/local/bin/composer
-
 sed -i '1i export PATH="$HOME/.composer/vendor/bin:$PATH"' $HOME/.bashrc
 source $HOME/.bashrc
-
-composer global require "drush/drush:6.*"
-composer global require "phpunit/phpunit=4.1.*"
 
 a2enmod expires
 
@@ -70,9 +76,11 @@ do
     sed -i 's/^;*\(upload_max_filesize\) =.*$/\1 = 32M/g' $line
 done
 
-bash <(curl -sL https://github.com/phpshift/vim-pathogen-installer/raw/master/install.sh)
-
 newlist -q mailman admin@example.com $PASSWD
+
+bash <(curl -sL https://raw.githubusercontent.com/pantarei/vundle-installer/master/install.sh)
+bash <(curl -sL https://raw.githubusercontent.com/pantarei/composer-installer/master/install.sh)
+bash <(curl -sL https://raw.githubusercontent.com/pantarei/npm-installer/master/install.sh)
 
 # Additional webmin/virtualmin configuration.
 cat >> /etc/webmin/virtual-server/config <<-EOF
