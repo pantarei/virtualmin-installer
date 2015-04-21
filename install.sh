@@ -48,7 +48,7 @@ git checkout $BRANCH
 sh <(curl -sL http://software.virtualmin.com/gpl/scripts/install.sh) --force --host host.example.com
 
 # Post-configure after initial installation.
-aptitude -y install automysqlbackup bmon colordiff fail2ban ffmpeg git htop libapache2-mod-rpaf libssh2-php logwatch lvm2 memcached mlocate mytop nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync snmp-mibs-downloader sshfs usermin usermin-virtual-server-mobile varnish vim virtualmin-base virtualmin-base webmin webmin-virtual-server-mobile webmin-virtualmin-dav webmin-virtualmin-svn
+aptitude -y install automysqlbackup bmon colordiff fail2ban ffmpeg git htop libapache2-mod-rpaf libgd2-xpm libssh2-php logwatch lvm2 memcached mlocate mytop nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync snmp-mibs-downloader sshfs usermin usermin-virtual-server-mobile varnish vim virtualmin-base virtualmin-base webmin webmin-virtual-server-mobile webmin-virtualmin-dav webmin-virtualmin-svn
 
 # Rsync all prepared template files.
 rsync -av $TMPDIR/files/etc/ /etc
