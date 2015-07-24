@@ -158,6 +158,6 @@ virtualmin create-domain --default-features --domain alias.example.com --alias e
 mkdir -p /home/example/public_html
 cd /home/example/public_html
 echo "<?php phpinfo(); ?>" > phpinfo.php
-curl -sL http://cgit.drupalcode.org/drustack/plain/drustack.sh | ACTION=build PACKAGE=full bash
+bash <(curl -sL http://cgit.drupalcode.org/drustack/plain/drustack.sh) -f
 drush -y site-install standard --db-url=mysql://example:$PASSWD@localhost/example --account-pass=$PASSWD
 chown -Rf example:example /home/example/
