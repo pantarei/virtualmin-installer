@@ -14,28 +14,32 @@ BRANCH="master"
 PASSWD=`< /dev/urandom tr -dc A-Za-z0-9 | head -c8`
 TMPDIR=`mktemp -d -t virtualmin-installer.XXXXXX`
 
-# Ensure all APT source and install required packages.
-sed -i 's/^#\s*deb/deb/g' /etc/apt/sources.list
-aptitude update && aptitude -y full-upgrade && aptitude autoclean && aptitude clean && \
-    aptitude -y install coreutils curl git pwgen sed ubuntu-extras-keyring wget && \
-    tasksel install openssh-server && \
-    tasksel install server && \
-    tasksel install mail-server
-
-apt-add-repository -y ppa:duggan/composer && aptitude update
-aptitude -y install php5-composer
-composer selfupdate && composer global update
-
-add-apt-repository -y ppa:chris-lea/node.js && aptitude update
-aptitude -y install nodejs build-essential
-npm -g update && npm -g upgrade
-
-# Install Linux kernel extra modules and enable quota support.
-aptitude -y install linux-image-extra-`uname -r`
-modprobe quota_v1 quota_v2
-
 # Update root password
 echo "root:$PASSWD" | chpasswd
+
+# Ensure all APT source and install required packages.
+sed -i 's/^#\s*deb/deb/g' /etc/apt/sources.list
+apt-get install aptitude dselect tasksel
+apt-get update && aptitude -y full-upgrade && aptitude autoclean && aptitude clean
+apt-get -y install coreutils curl git pwgen sed wget
+dselect update
+tasksel install openssh-server
+tasksel install server
+tasksel install mail-server
+
+# Install Linux kernel extra modules and enable quota support.
+apt-get -y install linux-generic-lts-xenial
+modprobe quota_v1 quota_v2
+
+# Install Virtualmin with GPL installation script.
+echo "deb http://software.virtualmin.com/gpl/ubuntu/ virtualmin-trusty main" >> /etc/apt/sources.list
+echo "deb http://software.virtualmin.com/gpl/ubuntu/ virtualmin-universal main" >> /etc/apt/sources.list
+curl -sL http://software.virtualmin.com/lib/RPM-GPG-KEY-virtualmin | apt-key add
+curl -sL http://software.virtualmin.com/lib/RPM-GPG-KEY-webmin | apt-key add
+apt-get update
+apt-get -y install virtualmin-base webmin-security-updates webmin-virtual-server webmin-virtual-server-theme webmin-virtualmin-awstats webmin-virtualmin-htpasswd webmin-virtualmin-mailman
+
+
 
 # Clone repo into temp folder.
 cd $TMPDIR
@@ -44,11 +48,63 @@ git remote add origin https://github.com/phpshift/virtualmin-installer.git
 git fetch origin
 git checkout $BRANCH
 
-# Install Virtualmin with GPL installation script.
-sh <(curl -sL http://software.virtualmin.com/gpl/scripts/install.sh) --force --host host.example.com
-
 # Post-configure after initial installation.
-aptitude -y install automysqlbackup bmon colordiff fail2ban ffmpeg fonts-droid fonts-noto git htop libapache2-mod-rpaf libssh2-php logwatch lvm2 memcached mlocate mytop nmap ntp openssh-server pbzip2 php-apc php-codesniffer php5-curl php5-gd php5-gmp php5-imap php5-intl php5-mcrypt php5-memcache php5-pgsql php5-snmp php5-sqlite php5-tidy php5-xdebug php5-xmlrpc phpmyadmin pwgen resolvconf rsync snmp-mibs-downloader sshfs usermin usermin-virtual-server-mobile varnish vim virtualmin-base virtualmin-base webmin webmin-virtual-server-mobile webmin-virtualmin-dav webmin-virtualmin-svn
+apt-get
+-y
+install
+automysqlbackup
+bmon
+build-essential
+colordiff
+composer
+fail2ban
+ffmpeg
+fonts-droid
+fonts-noto
+git
+htop
+libapache2-mod-rpaf
+libssh2-php
+logwatch
+lvm2
+memcached
+mlocate
+mytop
+nmap
+nodejs
+ntp
+openssh-server
+pbzip2
+php-apc
+php-codesniffer
+php5-curl
+php5-gd
+php5-gmp
+php5-imap
+php5-intl
+php5-mcrypt
+php5-memcache
+php5-pgsql
+php5-snmp
+php5-sqlite
+php5-tidy
+php5-xdebug
+php5-xmlrpc
+phpmyadmin
+pwgen
+resolvconf
+rsync
+snmp-mibs-downloader
+sshfs
+usermin
+usermin-virtual-server-mobile
+varnish
+vim
+virtualmin-base
+webmin
+webmin-virtual-server-mobile
+webmin-virtualmin-dav
+webmin-virtualmin-svn
 
 # Rsync all prepared template files.
 rsync -av $TMPDIR/files/etc/ /etc
