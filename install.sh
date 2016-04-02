@@ -10,7 +10,7 @@ export VIRTUALMIN_NONINTERACTIVE=1
 export DEBIAN_FRONTEND=noninteractive
 
 # Define variables.
-BRANCH="master"
+BRANCH="trusty"
 PASSWD=`< /dev/urandom tr -dc A-Za-z0-9 | head -c8`
 TMPDIR=`mktemp -d -t virtualmin-installer.XXXXXX`
 
